@@ -1,10 +1,17 @@
-module Content
+module Assets
+open System
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 
+type AssetType =
+    | Font of SpriteFont
+    | Sprite of Texture2D
+
+let loadAsset<'a>  (contentManager : ContentManager) (path) =
+    contentManager.Load<'a>(path)
+
 module Fonts =
-    let Xolonium (contentManager : ContentManager) =
-        contentManager.Load<SpriteFont>("Fonts/Xolonium")
+    let Xolonium contentManager = loadAsset<SpriteFont> contentManager "Fonts/Xolonium"
 
 module Sprites =
     let private sprites = "Sprites/"

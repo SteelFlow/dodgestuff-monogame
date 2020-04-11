@@ -1,5 +1,6 @@
 namespace App
 
+open Assets
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
@@ -9,7 +10,7 @@ type Game1 () as this =
  
     let graphics = new GraphicsDeviceManager(this)
     let mutable spriteBatch = Unchecked.defaultof<_>
-    let mutable font:SpriteFont = null
+    let font = lazy (Fonts.Xolonium this.Content)
 
     do
         this.Content.RootDirectory <- "Content"
@@ -23,8 +24,7 @@ type Game1 () as this =
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
-        font <- Content.Fonts.Xolonium this.Content
-
+        do font.Force() |> ignore 
         // TODO: use this.Content to load your game content here
  
     override this.Update (gameTime) =
@@ -39,7 +39,7 @@ type Game1 () as this =
         this.GraphicsDevice.Clear Color.CornflowerBlue
 
         spriteBatch.Begin()
-        spriteBatch.DrawString(font, "Hello World", Vector2(float32 32, float32 32), Color.White)
+        spriteBatch.DrawString(font.Value, "Hello World", Vector2(float32 32, float32 32), Color.White)
         spriteBatch.End()
         // TODO: Add your drawing code here
 
