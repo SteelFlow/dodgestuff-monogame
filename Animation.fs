@@ -5,32 +5,30 @@ open Microsoft.Xna.Framework.Graphics
 
 
 type AnimationFrame =
-    { Source: Texture2D }
+    { Source: Texture2D
+      FrameDuration: TimeSpan }
 
 type Animation =
-    { Frames: AnimationFrame list
-      FrameDuration: TimeSpan }
+    { Frames: AnimationFrame list }
 
 type AnimationState =
     { Animation: Animation
       TimeToNextFrame: TimeSpan }
 
-let private listShift frames =
-    frames
-    |> List.splitAt 0
-    |> fun (head, tail) -> tail |> List.append head
+let private listShift (frames) =
+    match frames with
+    | []
+    | [ _ ] -> frames
+    | head :: tail -> List.append tail [ head ]
 
 let private nextFrame state =
-    match state.Animation.Frames with
-    | []
-    | [ _ ] -> state
-    | _ ->
-        let shiftedFrames = state.Animation.Frames |> listShift
-        { state with Animation = { state.Animation with Frames = shiftedFrames } }
+    let shiftedFrames = state.Animation.Frames |> listShift
+    { state with
+          Animation = { state.Animation with Frames = shiftedFrames }
+          TimeToNextFrame = shiftedFrames.Head.FrameDuration }
 
 let update (state: AnimationState) (delta: TimeSpan) =
-    if delta - state.TimeToNextFrame > TimeSpan.Zero
-    then { state with TimeToNextFrame = delta - state.TimeToNextFrame }
-    else nextFrame state
+    let time = state.TimeToNextFrame - delta
+    if time > TimeSpan.Zero then { state with TimeToNextFrame = time } else nextFrame state
 
 let frameToDraw (state: AnimationState) = state.Animation.Frames.Head
