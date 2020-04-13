@@ -9,11 +9,9 @@ type AnimationFrame =
       FrameDuration: TimeSpan }
 
 type Animation =
-    { Frames: AnimationFrame list }
-
-type AnimationState =
-    { Animation: Animation
+    { Frames: AnimationFrame list
       TimeToNextFrame: TimeSpan }
+    member this.CurrentFrame = this.Frames.Head
 
 let private listShift (frames) =
     match frames with
@@ -21,14 +19,16 @@ let private listShift (frames) =
     | [ _ ] -> frames
     | head :: tail -> List.append tail [ head ]
 
-let private nextFrame state =
-    let shiftedFrames = state.Animation.Frames |> listShift
-    { state with
-          Animation = { state.Animation with Frames = shiftedFrames }
+let private nextFrame anim =
+    let shiftedFrames = anim.Frames |> listShift
+    { anim with
+          Frames = shiftedFrames
           TimeToNextFrame = shiftedFrames.Head.FrameDuration }
 
-let update (state: AnimationState) (delta: TimeSpan) =
-    let time = state.TimeToNextFrame - delta
-    if time > TimeSpan.Zero then { state with TimeToNextFrame = time } else nextFrame state
+let update (animation: Animation) (delta: TimeSpan) =
+    let time = animation.TimeToNextFrame - delta
+    if time > TimeSpan.Zero
+    then { animation with TimeToNextFrame = time }
+    else nextFrame animation
 
-let frameToDraw (state: AnimationState) = state.Animation.Frames.Head
+let frameToDraw (animation: Animation) = animation.Frames.Head

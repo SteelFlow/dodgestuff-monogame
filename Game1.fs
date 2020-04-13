@@ -17,8 +17,7 @@ type Game1() as this =
     let mutable player =
         lazy
             (Player.frames this.Content
-             |> Player.animation
-             |> Player.initialState
+             |> Player.initAnimation
              |> Player.create)
 
     do
@@ -41,16 +40,16 @@ type Game1() as this =
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed
             || Keyboard.GetState().IsKeyDown(Keys.Escape)) then this.Exit()
 
-        let state = player.Value.State
+        let animation = player.Value.Animation
         // TODO: Add your update logic here
-        player <- lazy (Player.create (Animation.update state gameTime.ElapsedGameTime))
+        player <- lazy (Player.create (Animation.update animation gameTime.ElapsedGameTime))
         player.Force() |> ignore
         base.Update(gameTime)
 
     override this.Draw(gameTime) =
         this.GraphicsDevice.Clear Color.CornflowerBlue
 
-        let frame = player.Value.State.Animation.Frames.Head.Source
+        let frame = player.Value.Animation.CurrentFrame.Source
         spriteBatch.Begin()
         spriteBatch.Draw(frame, Vector2(float32 100, float32 100), Color.White)
         spriteBatch.DrawString(font.Value, "Hello World", Vector2(float32 32, float32 32), Color.White)
