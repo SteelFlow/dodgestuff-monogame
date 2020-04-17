@@ -8,7 +8,7 @@ let frameDuration = TimeSpan.FromMilliseconds 500.0
 
 let frames contentManager =
     [ { Source = Sprites.Player.up1 contentManager
-        FrameDuration = (TimeSpan.FromSeconds 2.0) }
+        FrameDuration = frameDuration }
       { Source = Sprites.Player.up2 contentManager
         FrameDuration = frameDuration } ]
 
